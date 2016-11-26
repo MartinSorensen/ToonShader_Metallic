@@ -155,11 +155,12 @@
 			//is because one is also used in the equation for thresholding.
 			specularReflection = (attenuation * _LightColor0.rgb * _SpecColor.rgb * pow(max(0.0, dot(reflect(-lightDirection, normalDirection), viewDirection)), _Shininess))*_SpecReflectionPower;
 			
-
 			//Thesholding: Creating 3 cuts in the specular highlight(s) by thresholding the reflection value (same equation as above).
 			//Each cut will lower the intensity just a bit to give it a distinction that that multiple cuts exists from the same light source.
 			//The intensity is lowered manually by multiplying with 0.9 and 0.8 respectively, and the threshold is manually set to the same
 			//lesser amount for the cuts.
+			//pow is a Unity Mathf of "power" and returns a value to the power of another value (in this case, it is raised to the power of the Shininess)
+			//
 			if (attenuation *  pow(max(0.0, dot(reflect(-lightDirection, normalDirection), viewDirection)), _Shininess) > _HighlightThreshold) { //Is it above threshold?
 				fragmentColor = (_SpecColor.a * _LightColor0.rgb * _SpecColor.rgb + (1.0 - _SpecColor.a) * fragmentColor) + specularReflection;  //Set the color and add reflectivity
 			}
@@ -177,7 +178,7 @@
 		//is the interpolation value. Thus we are interpolating based on our vector direction of the light.
 		//Once the interpolation value is determined, we may threshold this against the vector dot product of viewing direction and normal direction.
 		//This vector dot product in turn yields the silhouettes of the object, which then may be outlined with the OutlineColor.
-		if (dot(viewDirection, normalDirection) < lerp(_UnlitOutline, _LitOutline, max(0.0, dot(normalDirection, lightDirection)))) //thresholding based on interpolation
+		if (dot(normalDirection, viewDirection) < lerp(_UnlitOutline, _LitOutline, max(0.0, dot(normalDirection, lightDirection)))) //thresholding based on interpolation
 		{
 			//Set the color of the outline (subtracted with the specularReflection, diffuseReflection and ambientLighting as these will also influence the outline color)
 			fragmentColor = _LightColor0.rgb * (_OutlineColor.rgb - specularReflection - diffuseReflection - ambientLighting);
